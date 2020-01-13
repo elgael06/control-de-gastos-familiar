@@ -1,0 +1,7 @@
+{
+  "name": "control-de-gastros-familiar",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
