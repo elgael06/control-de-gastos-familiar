@@ -18,13 +18,12 @@ import {
   IonToolbar,
   IonFabButton
   } from '@ionic/react';
-import { calendar, analytics,calculator, briefcase, arrowForward,filing, add } from 'ionicons/icons';
+import { calendar, analytics, briefcase, arrowForward,filing, add } from 'ionicons/icons';
 import React from 'react';
 import './Home.css';
 
 import {sesionProps} from '../props';
 import { connect } from 'react-redux';
-import { eventoModal } from '../actions';
 
 const tiposGastos =[
   {
@@ -52,10 +51,9 @@ const tiposGastos =[
 type homeProps ={
   usuario?:sesionProps,
   stateModal:boolean,
-  evModal:(state:boolean)=>void,
 }
 
-const HomePage = ({usuario,stateModal,evModal}:homeProps) => {
+const HomePage = ({usuario,stateModal}:homeProps) => {
 
   console.log('usuario: ',usuario);
   console.log('state Modal : ',stateModal);
@@ -71,11 +69,7 @@ const HomePage = ({usuario,stateModal,evModal}:homeProps) => {
       </IonHeader>
       <IonContent>
        <TopCartPresent />
-        <IonTitle>
-          <IonIcon icon={calculator} slot='end' /> 
-         <strong> Gastos</strong>
-        </IonTitle>
-        <IonList lines="inset">
+        <IonList style={{marginTop:'40px'}} lines="inset">
           {tiposGastos.map(e=>(
             <ItemMonitor 
               key={e.href}
@@ -87,8 +81,8 @@ const HomePage = ({usuario,stateModal,evModal}:homeProps) => {
         </IonList>
         <IonFabButton 
           type='button'
-          onClick={()=>evModal(true)}
-          style={{float:'right',margin:'5px',position:'sticky',button:'0px'}} >
+          routerLink='/gasto/add'
+          style={{position:'fixed',display:'flex',bottom:'10px',right:'20px',zIndex:'9999'}} >
           <IonIcon icon={add} />
         </IonFabButton>
       </IonContent>
@@ -124,9 +118,7 @@ const mapStateToProps = (state:any) =>({
 });
 
 const mapDispatchToProps = (dispatch:any) =>({
-  evModal(state:boolean){
-      dispatch(eventoModal(state));
-  }
+
 });
 
 export default connect(mapStateToProps,mapDispatchToProps)(HomePage);
