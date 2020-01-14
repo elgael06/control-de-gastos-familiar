@@ -32,6 +32,7 @@ import { connect } from 'react-redux';
 import { sesionProps } from './props';
 import { cerrarSesion } from './middleware/manejo_sesion';
 import PageNotFound from './pages/PageNotFound';
+import AddGasto from './pages/AddGasto';
 
 const appPages: AppPage[] = [
   {
@@ -63,6 +64,7 @@ const App = ({usuario,onClose}:appProps) => {
   
         <Route path="/" component={Home} exact={true} />
         <Route path="/home" component={Home} exact={true} />
+        <Route path="/gasto/add" component={AddGasto} exact={true} />
         <Route path="/list" component={List} exact={true} />
         
     </IonRouterOutlet>
