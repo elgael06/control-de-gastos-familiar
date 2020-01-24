@@ -26,3 +26,7 @@ export type modalActions = {
     type:string,
     estatus:boolean
 }
+export type loadingActions ={
+    type:string,
+    status:boolean
+}

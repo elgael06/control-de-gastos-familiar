@@ -1,6 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
+import { IonApp, IonRouterOutlet, IonSplitPane, IonLoading } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { AppPage } from './declarations';
 import { home, list } from 'ionicons/icons';
@@ -52,10 +52,11 @@ const appPages: AppPage[] = [
 
 type appProps ={
   usuario?:sesionProps,
-  onClose:()=>void
+  onClose:()=>void,
+  loading:boolean
 }
 
-const App = ({usuario,onClose}:appProps) => {
+const App = ({usuario,onClose,loading}:appProps) => {
 
   const Inicio =()=>(<Suspense fallback={()=><div> Cargando Inicio...</div>} >
     <Menu appPages={appPages} usuario={usuario} onClose={onClose} />
@@ -87,14 +88,19 @@ const App = ({usuario,onClose}:appProps) => {
           {usuario ? <Inicio /> : <Sesion />}
         </IonSplitPane>
       </IonReactRouter>
+      <IonLoading
+        isOpen={loading}
+        message={'cargando...'}
+      />
     </IonApp>
   );
 }
 
 const mapStateToProps = (state:any) =>{
-  console.log(state)
+  console.log('state => ',state)
   return({
   usuario:state.sesion,
+  loading:state.loading
 })};
 
 const mapDispatchToProps = (dispatch:any) =>({

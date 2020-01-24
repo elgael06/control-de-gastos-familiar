@@ -50,9 +50,7 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
     
     useEffect(()=>{
         //eslint-disable-next-line
-        selectAllGastos(setGastos);
-        selectClasificador(setClasificadores);
-        selectAllTipo(setTipos);
+        initGastos();
     },[]);
 
     useEffect(()=>{
@@ -60,6 +58,12 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
          gastos.forEach((e:any)=>{ res +=e.cantidad});
         setTotal(res);
     },[gastos]);
+
+    const initGastos = ()=>{
+        selectAllGastos(setGastos);
+        selectClasificador(setClasificadores);
+        selectAllTipo(setTipos);
+    }
 
     const guardarTipo =(value?:string)=>{
         console.log('guardar tipo...');
@@ -138,9 +142,6 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
 
             <IonList>
                 {gastos.map((e:any,id:number)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
-                {gastos.map((e:any,id)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
-                {gastos.map((e:any,id)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
-                {gastos.map((e:any,id)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
             </IonList>
 
         </IonContent>

@@ -6,7 +6,7 @@ const initialState:Object =({
     sesion:null,
     modal:false,
     gastos:[],
+    loading:false,
 });
-
 
 export default createStore(reducers,initialState);
