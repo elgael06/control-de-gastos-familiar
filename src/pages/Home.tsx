@@ -1,10 +1,6 @@
+import React from 'react';
 import {
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonContent,
   IonHeader,
   IonIcon,
@@ -19,11 +15,11 @@ import {
   IonFabButton
   } from '@ionic/react';
 import { calendar, analytics, briefcase, arrowForward,filing, add } from 'ionicons/icons';
-import React from 'react';
 import './Home.css';
 
 import {sesionProps} from '../props';
 import { connect } from 'react-redux';
+import TopCartPresent from '../components/TopCartPresent';
 
 const tiposGastos =[
   {
@@ -69,7 +65,7 @@ const HomePage = ({usuario,stateModal}:homeProps) => {
       </IonHeader>
       <IonContent>
        <TopCartPresent />
-        <IonList style={{marginTop:'40px'}} lines="inset">
+        <IonList style={{marginTop:'-4px'}} lines="inset">
           {tiposGastos.map(e=>(
             <ItemMonitor 
               key={e.href}
@@ -80,9 +76,9 @@ const HomePage = ({usuario,stateModal}:homeProps) => {
           }
         </IonList>
         <IonFabButton 
+          className='fab-icon'
           type='button'
-          routerLink='/gasto/add'
-          style={{position:'fixed',display:'flex',bottom:'10px',right:'20px',zIndex:'9999'}} >
+          routerLink='/gastos/add' >
           <IonIcon icon={add} />
         </IonFabButton>
       </IonContent>
@@ -95,22 +91,6 @@ const ItemMonitor =({icon,title}:any)=>( <IonItem>
   <IonListHeader slot='end'><IonLabel>{title}</IonLabel></IonListHeader>
   <IonIcon icon={arrowForward}  slot='end'/>
 </IonItem>);
-
-const TopCartPresent =()=>( <IonCard className="welcome-card">
-<img src="https://miro.medium.com/max/902/1*CPSTzfUTCCpUbllyiPvl_A.jpeg" alt=""/>
-<IonCardHeader>
-  <IonCardSubtitle>Estadisticas de uso.</IonCardSubtitle>
-  <IonCardTitle>Contro de gastos</IonCardTitle>
-</IonCardHeader>
-<IonCardContent>
-  <p>
-    Esta aplicacion te ayudara a llevar el control de tus finanzas a detalle de forma rapida y facil.
-    con un par de pasos llevaras el control de tus gastos.
-  </p>
-</IonCardContent>
-</IonCard>);
-
-
 
 const mapStateToProps = (state:any) =>({
   usuario:state.sesion,

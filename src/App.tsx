@@ -1,14 +1,10 @@
-import React, { Fragment } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, IonSplitPane } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { AppPage } from './declarations';
-
-import Menu from './components/Menu';
-import Home from './pages/Home';
-import List from './pages/List';
 import { home, list } from 'ionicons/icons';
-import Login from './pages/Login';
+
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -28,11 +24,18 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+
 import { connect } from 'react-redux';
 import { sesionProps } from './props';
 import { cerrarSesion } from './middleware/manejo_sesion';
-import PageNotFound from './pages/PageNotFound';
-import AddGasto from './pages/AddGasto';
+
+/* rutas */
+const Menu          = lazy (()=> import('./components/Menu'));
+const Home          = lazy (()=> import('./pages/Home'));
+const List          = lazy (()=> import('./pages/List'));
+const Login         = lazy (()=> import('./pages/Login'));
+const PageNotFound  = lazy (()=> import('./pages/PageNotFound'));
+const AddGasto      = lazy (()=> import('./pages/AddGasto'));
 
 const appPages: AppPage[] = [
   {
@@ -54,26 +57,28 @@ type appProps ={
 
 const App = ({usuario,onClose}:appProps) => {
 
-  const Inicio =()=>(<Fragment>
+  const Inicio =()=>(<Suspense fallback={()=><div> Cargando Inicio...</div>} >
     <Menu appPages={appPages} usuario={usuario} onClose={onClose} />
     <IonRouterOutlet id="main" color='success'>
-
+        
         <Route path='*' component={PageNotFound} />
 
         <Redirect from='/login' to='/home' />
   
         <Route path="/" component={Home} exact={true} />
         <Route path="/home" component={Home} exact={true} />
-        <Route path="/gasto/add" component={AddGasto} exact={true} />
+        <Route path="/gastos/add" component={AddGasto} exact={true} />
         <Route path="/list" component={List} exact={true} />
         
     </IonRouterOutlet>
-  </Fragment>);
+  </Suspense>);
 
-  const Sesion= () =>(<IonRouterOutlet id='main'>
-      <Redirect from='/*' to='/login' />
-      <Route path="/login" component={Login} exact={true} />
-  </IonRouterOutlet>); 
+  const Sesion= () =>(<Suspense fallback={<div>Cargando Login...</div>}>
+          <IonRouterOutlet id='main'>
+            <Redirect from='/*' to='/login' />
+            <Route path="/login" component={Login} exact={true} />
+        </IonRouterOutlet>
+      </Suspense>); 
 
   return (
     <IonApp>

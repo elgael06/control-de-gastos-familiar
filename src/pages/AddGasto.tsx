@@ -1,16 +1,34 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonContent, IonBackButton, IonList, IonItem, IonLabel, IonInput, IonIcon, IonTextarea, IonFabButton, IonCard, IonItemSliding, IonItemDivider, IonItemOption, IonItemOptions } from '@ionic/react';
+import React, { useState, useEffect } from 'react';
+import { 
+    IonPage, 
+    IonTitle, 
+    IonContent,
+    IonList, 
+    IonItem, 
+    IonLabel, 
+    IonInput, 
+    IonIcon, 
+    IonTextarea, 
+    IonFabButton, 
+    IonCard, 
+    IonItemDivider, 
+    IonItemGroup 
+} from '@ionic/react';
 import { connect } from 'react-redux';
-import { add,save, list, create, trash } from 'ionicons/icons';
+import { save } from 'ionicons/icons';
 import ModalAgregar from '../components/ModalAgregar';
-import { selectAllGastos, insertGastos } from '../middleware/bd_gastos';
+import { 
+    selectAllGastos, 
+    insertGastos, 
+    selectClasificador, 
+    selectAllTipo 
+} from '../middleware/bd_gastos';
 import { gastosProps } from '../props';
+import ItemListGastos from '../components/ItemListGastos';
+import ListAccess from '../components/ListAccess';
+import ItemListSelect from '../components/ItemListSelect';
+import HeadTitle from '../components/HeadTitle';
 
-type ListAccessProps ={
-    event?:()=>void,
-    title:string,
-    value?:string
-}
 
 type addGastosProps ={
     gastos:[],
@@ -19,87 +37,115 @@ type addGastosProps ={
 }
 
 const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
+    const [cantidad,setCantidad] = useState('');
+    const [IdTipo,setIdTipo] = useState('');
+    const [idClasificacion,setIdClasificacion] = useState('');
+    const [descripcion,setDescripcion] = useState(''); 
     const [modalTipo,setTipo] = useState(false);
     const [modalClasificador,setClasificador] = useState(false);
     const [total,setTotal] = useState(-1);
 
+    const [clasificadores,setClasificadores] = useState([]);
+    const [tipos,setTipos] = useState([]);
+    
     useEffect(()=>{
+        //eslint-disable-next-line
         selectAllGastos(setGastos);
+        selectClasificador(setClasificadores);
+        selectAllTipo(setTipos);
     },[]);
+
     useEffect(()=>{
         let res = 0;
          gastos.forEach((e:any)=>{ res +=e.cantidad});
         setTotal(res);
     },[gastos]);
 
-    const guardarTipo =()=>{
-        
+    const guardarTipo =(value?:string)=>{
+        console.log('guardar tipo...');
+        !value || setIdTipo(value);
+    }
+
+    const guardarClasificador =(value?:string)=>{
+        !value || setIdClasificacion(value);
     }
 
     const onGuardar = async()=>{
+
         let gastos:gastosProps = {
-            cantidad:21.35,
-            descripcion:'',
-            fecha:'',
-            id_clasificacion:'0',
+            cantidad:Number.parseInt( cantidad ),
+            descripcion:descripcion,
+            fecha:new Date().getTime().toString(),
+            id_clasificacion:idClasificacion,
             id_usuario:'0',
-            tipo_gasto:'0',            
+            tipo_gasto:IdTipo,            
         };
        let resultado = await saveGasto(gastos);
        alert(`Gasto guardado en id ${resultado}`);
+       
     } 
 
-    return(  <IonPage>
+    const tipo_gasto =():string=>{
 
-        <IonHeader>
-          <IonToolbar>
-            <IonButtons slot="start">
-                <IonBackButton defaultHref="/home" />
-            </IonButtons>
-            <IonTitle>Nuevo Gasto.</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-  
+        return '';
+    }
+    const clasificacion_gasto =():string=>{
+
+        return '';
+    }
+
+    return(<IonPage>
+        <HeadTitle href='/home' title='Nuevo Gasto.' />
         <IonContent>
-            <IonCard style={{padding:'15px' }}>
+            <IonCard color='light' style={{padding:'15px',position:'sticky',top:10,zIndex:99 }}>
+                <IonItem>
+                    <IonLabel>Cantidad : $</IonLabel>
+                    <IonInput 
+                        type='number'
+                        placeholder='0.00'
+                        value={cantidad}
+                        onIonChange={(e:any)=>setCantidad(e.target.value)}
+                    />
+                </IonItem>
+                <ListAccess 
+                    title='Tipo Gasto :'
+                    value={tipo_gasto()}
+                    event={()=>setTipo(true)}
+                />
+                <ListAccess 
+                    title='Clasificacion :'
+                    value={clasificacion_gasto()}
+                    event={()=>setClasificador(true)}
+                />
+                <hr />
+                <IonItemGroup>
+                    <IonItem color='primary'>
+                        <IonLabel>Descripcion </IonLabel>
+                    </IonItem>
                     <IonItem>
-                        <IonLabel>Cantidad : $</IonLabel>
-                        <IonInput 
-                            type='number'
-                            placeholder='0.00'
+                        <IonTextarea 
+                            cols={5} placeholder='Sin Descripcion...'
+                            value={descripcion}
+                            onIonChange={(e:any)=>setDescripcion(e.target.value)}
                         />
                     </IonItem>
-                    <ListAccess 
-                        title='Tipo Gasto :'
-                        value='123r'
-                        event={()=>setTipo(true)}
-                    />
-                    <ListAccess 
-                        title='Clasificacion :'
-                        event={()=>setClasificador(true)}
-                    />
-                    <hr />
-                    <IonLabel>Descripcion :</IonLabel>
-                    <IonItem>
-                        <IonTextarea placeholder='Sin Descripcion...' />
-                    </IonItem>
-                </IonCard>
-                <br/>
-                <IonItemDivider>
+                </IonItemGroup>
+            </IonCard>
+
+            <IonItemDivider style={{padding:'25px',position:'fixed',marginTop:-15,zIndex:95 }}>
                 <IonTitle> Total : <u style={{float:'right'}}>$ {new Intl.NumberFormat('MX').format(total)}</u></IonTitle>
-                </IonItemDivider>
-                <IonList>
-                    {gastos.map((e:any,id)=>{
-                        return (<ItemList key={id} e={e} id={id} />);
-                    })}
-                </IonList>
+            </IonItemDivider>
+
+            <IonList>
+                {gastos.map((e:any,id:number)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
+                {gastos.map((e:any,id)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
+                {gastos.map((e:any,id)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
+                {gastos.map((e:any,id)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
+            </IonList>
+
         </IonContent>
         
-        <IonFabButton 
-          type='button'
-          color='success'
-          onClick={onGuardar}
-          style={{position:'fixed',display:'flex',bottom:'10px',right:'20px',zIndex:'9999'}} >
+        <IonFabButton type='button' className='fab-icon' color='success'onClick={onGuardar} >
           <IonIcon icon={save} />
         </IonFabButton>
 
@@ -108,48 +154,20 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
             evCerrar={()=>setTipo(false)}
             submin={guardarTipo}
             title='Agregar Tipo.'>
+            {tipos.map((e:any,id)=><ItemListSelect e={e} descripcion={e.descripcion} key={id} />)}
+        </ModalAgregar>
 
-            </ModalAgregar>
+        <ModalAgregar
+            status={modalClasificador}
+            evCerrar={()=>setClasificador(false)}
+            submin={guardarClasificador}
+            title='Agregar Clasificador.'>
+        </ModalAgregar>
 
-            <ModalAgregar
-                status={modalClasificador}
-                evCerrar={()=>setClasificador(false)}
-                submin={guardarTipo}
-                title='Agregar Clasificador.'>
-
-            </ModalAgregar>
+        {clasificadores.map((e,id)=><ItemListSelect e={e} key={id} />)}
 
       </IonPage>);
 }
-
-
-const ListAccess=({title,event,value}:ListAccessProps)=>(<Fragment>
-    <IonItem onClick={event} >
-        <IonLabel>{title}</IonLabel>
-        <IonLabel color='secondary'>{value}</IonLabel>
-        <IonIcon icon={add} size='large' slot='end' color='primary' />
-    </IonItem>
-</Fragment>);
-
-const ItemList = ({e,id}:any)=>(<IonItemSliding onDropCapture={()=>console.log('blur...')}>
-    <IonItemOptions onClick={()=>console.log('editar...')} side='start'>
-        <IonItemOption>
-            <IonIcon icon={create} />
-        </IonItemOption>
-    </IonItemOptions>
-    <IonItem>
-        <IonIcon slot='start' icon={list} />
-        {e.descripcion}
-        <p slot='end'>$ {e.cantidad}</p>
-    </IonItem>
-
-    <IonItemOptions onClick={()=>console.log('borrar...')} side='end'>
-        <IonItemOption color='danger'>
-            <IonIcon icon={trash} />
-        </IonItemOption>
-    </IonItemOptions>
-</IonItemSliding>);
-
 
 const mapStateToProps = (state:any) =>({
     gastos:state.gastos
