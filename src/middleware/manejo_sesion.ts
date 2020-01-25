@@ -17,9 +17,7 @@ export const cerrarSesion = async (dispatch:any)=>{
         await cerrarSesionGogle()
         dispatch(removerSesion());  
     } catch(error){
-        console.log('====================================');
         console.log(error);
-        console.log('====================================');
     }
     dispatch(changeLoading(false));
 }
