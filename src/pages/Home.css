@@ -3,7 +3,7 @@
   overflow: hidden;
 }
 .fab-icon{
-  position: fixed;
+  position: absolute;
   display: flex;
   bottom: 5px;
   right: 12px;

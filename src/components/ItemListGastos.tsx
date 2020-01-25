@@ -1,7 +1,8 @@
 import React from 'react';
 import { IonItemSliding, IonItem, IonIcon } from '@ionic/react';
 import SlidIonItem from './SlidIonItem';
-import { create, list, trash } from 'ionicons/icons';
+import { create, trash, cash } from 'ionicons/icons';
+import { DeleteGasto } from '../middleware/bd_gastos';
 
 
 const ItemListGastos = ({e,id}:any)=>(<IonItemSliding onDropCapture={()=>console.log('blur...')}>
@@ -13,13 +14,17 @@ const ItemListGastos = ({e,id}:any)=>(<IonItemSliding onDropCapture={()=>console
     />
 
     <IonItem>
-        <IonIcon slot='start' icon={list} />
+        <IonIcon slot='start' icon={cash} />
         {e.descripcion}
         <p slot='end'>$ {e.cantidad}</p>
     </IonItem>
 
     <SlidIonItem 
-        onClick={()=>{ console.log('borrar...',id);  } }
+        onClick={()=>{ 
+                console.log('borrar...',id);
+                DeleteGasto(id);
+            }
+        }
         side='end'
         icon={trash}
         color='danger'

@@ -12,23 +12,21 @@ import {
     IonFabButton, 
     IonCard, 
     IonItemDivider, 
-    IonItemGroup 
+    IonItemGroup, 
+    IonPicker
 } from '@ionic/react';
 import { connect } from 'react-redux';
 import { save } from 'ionicons/icons';
-import ModalAgregar from '../components/ModalAgregar';
 import { 
     selectAllGastos, 
     insertGastos, 
-    selectClasificador, 
-    selectAllTipo 
 } from '../middleware/bd_gastos';
 import { gastosProps } from '../props';
 import ItemListGastos from '../components/ItemListGastos';
 import ListAccess from '../components/ListAccess';
-import ItemListSelect from '../components/ItemListSelect';
 import HeadTitle from '../components/HeadTitle';
 
+import './Home.css'
 
 type addGastosProps ={
     gastos:[],
@@ -36,18 +34,16 @@ type addGastosProps ={
     saveGasto:(value:gastosProps,onError?:()=>void)=>Promise< string>,
 }
 
+const defaultclassTipo = ({text:'',value:''});
+
 const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
     const [cantidad,setCantidad] = useState('');
-    const [IdTipo,setIdTipo] = useState('');
-    const [idClasificacion,setIdClasificacion] = useState('');
+    const [IdTipo,setIdTipo] = useState(defaultclassTipo);
+    const [idClasificacion,setIdClasificacion] = useState(defaultclassTipo);
     const [descripcion,setDescripcion] = useState(''); 
     const [modalTipo,setTipo] = useState(false);
-    const [modalClasificador,setClasificador] = useState(false);
     const [total,setTotal] = useState(-1);
 
-    const [clasificadores,setClasificadores] = useState([]);
-    const [tipos,setTipos] = useState([]);
-    
     useEffect(()=>{
         //eslint-disable-next-line
         initGastos();
@@ -55,48 +51,47 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
 
     useEffect(()=>{
         let res = 0;
-         gastos.forEach((e:any)=>{ res +=e.cantidad});
+         gastos.forEach((e:any)=>{ res += parseFloat(e.cantidad) || 0});
         setTotal(res);
     },[gastos]);
 
     const initGastos = ()=>{
         selectAllGastos(setGastos);
-        selectClasificador(setClasificadores);
-        selectAllTipo(setTipos);
     }
 
-    const guardarTipo =(value?:string)=>{
-        console.log('guardar tipo...');
-        !value || setIdTipo(value);
+    const handlePicker =(value?:any)=>{
+        !value ||guardarClasificadorTipo(value);
     }
 
-    const guardarClasificador =(value?:string)=>{
-        !value || setIdClasificacion(value);
+    const guardarClasificadorTipo =({tipo='',clasificacion=''}:any)=>{
+        console.log('clasificacion = ',clasificacion)
+        setIdClasificacion(clasificacion);
+        console.log('tipo = ',tipo);
+        setIdTipo(tipo);
     }
 
     const onGuardar = async()=>{
 
         let gastos:gastosProps = {
-            cantidad:Number.parseInt( cantidad ),
-            descripcion:descripcion,
+            cantidad:Number.parseFloat( cantidad ),
+            descripcion:descripcion || `${idClasificacion?.value} ${IdTipo?.value}.`,
             fecha:new Date().getTime().toString(),
-            id_clasificacion:idClasificacion,
+            id_clasificacion:idClasificacion?.value,
             id_usuario:'0',
-            tipo_gasto:IdTipo,            
+            tipo_gasto:IdTipo?.value,            
         };
        let resultado = await saveGasto(gastos);
-       alert(`Gasto guardado en id ${resultado}`);
-       
+       //alert(`Gasto guardado en id ${resultado}`);
+
+       setCantidad('');
+       setIdTipo(defaultclassTipo);
+       setIdClasificacion(defaultclassTipo);
+       setDescripcion('');
     } 
-
-    const tipo_gasto =():string=>{
-
-        return '';
-    }
-    const clasificacion_gasto =():string=>{
-
-        return '';
-    }
+    const botonesPicker = [
+        { text:'cancelar',handler(){console.log('cancelar...')},role:'calcel' },
+        { text:'seleccionar', handler:(value:any)=>handlePicker(value) }
+    ]
 
     return(<IonPage>
         <HeadTitle href='/home' title='Nuevo Gasto.' />
@@ -113,13 +108,13 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
                 </IonItem>
                 <ListAccess 
                     title='Tipo Gasto :'
-                    value={tipo_gasto()}
+                    value={IdTipo?.text}
                     event={()=>setTipo(true)}
                 />
                 <ListAccess 
                     title='Clasificacion :'
-                    value={clasificacion_gasto()}
-                    event={()=>setClasificador(true)}
+                    value={idClasificacion?.text}
+                    event={()=>setTipo(true)}
                 />
                 <hr />
                 <IonItemGroup>
@@ -136,36 +131,46 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
                 </IonItemGroup>
             </IonCard>
 
-            <IonItemDivider style={{padding:'25px',position:'fixed',marginTop:-15,zIndex:95 }}>
-                <IonTitle> Total : <u style={{float:'right'}}>$ {new Intl.NumberFormat('MX').format(total)}</u></IonTitle>
-            </IonItemDivider>
-
             <IonList>
                 {gastos.map((e:any,id:number)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
             </IonList>
 
+            <IonItemDivider style={{padding:'25px',zIndex:95 }}>
+                <IonTitle> Total : <u >$ {new Intl.NumberFormat('MX').format(total)}</u></IonTitle>
+            </IonItemDivider>
+
         </IonContent>
-        
+
         <IonFabButton type='button' className='fab-icon' color='success'onClick={onGuardar} >
-          <IonIcon icon={save} />
+            <IonIcon icon={save} />
         </IonFabButton>
 
-        <ModalAgregar
-            status={modalTipo}
-            evCerrar={()=>setTipo(false)}
-            submin={guardarTipo}
-            title='Agregar Tipo.'>
-            {tipos.map((e:any,id)=><ItemListSelect e={e} descripcion={e.descripcion} key={id} />)}
-        </ModalAgregar>
-
-        <ModalAgregar
-            status={modalClasificador}
-            evCerrar={()=>setClasificador(false)}
-            submin={guardarClasificador}
-            title='Agregar Clasificador.'>
-        </ModalAgregar>
-
-        {clasificadores.map((e,id)=><ItemListSelect e={e} key={id} />)}
+        <IonPicker
+        buttons={botonesPicker}
+            columns={[
+                {
+                    name:"tipo",
+                    options:[
+                        {text:"Tipo.",value:'indefinido'},
+                        {text:"Personal.",value:'personal'},
+                        {text:"Entretenimiento.",value:'entretenimiento'},
+                        {text:"Deuda.",value:'deuda'}
+                    ]
+                },
+                {
+                    name:"clasificacion",
+                    options:[
+                        {text:"Clasificacion.",value:'indefinida'},
+                        {text:"Casa.",value:'casa'},
+                        {text:"Dulces.",value:'dulces'},
+                        {text:"Bebidas.",value:'bebida'},
+                        {text:"Comida.",value:'comida'}
+                    ]
+                }
+            ]}
+            isOpen={modalTipo}
+            onDidDismiss={()=>setTipo(false)}
+        />
 
       </IonPage>);
 }
