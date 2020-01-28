@@ -4,7 +4,8 @@
   "private": true,
   "dependencies": {
     "@capacitor/android": "^1.3.0",
-    "@capacitor/core": "1.3.0",
+    "@capacitor/cli": "^1.4.0",
+    "@capacitor/core": "^1.3.0",
     "@capacitor/ios": "^1.3.0",
     "@ionic/react": "^4.11.0",
     "@ionic/react-router": "^4.11.0",
@@ -34,7 +35,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "copy-android": "ionic capacitor copy android",
+    "update-android": "ionic capacitor update android",
+    "add-android": "ionic capacitor add android"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -13,13 +13,15 @@ import {
     IonCard, 
     IonItemDivider, 
     IonItemGroup, 
-    IonPicker
+    IonPicker,
+    IonAlert
 } from '@ionic/react';
 import { connect } from 'react-redux';
 import { save } from 'ionicons/icons';
 import { 
     selectAllGastos, 
-    insertGastos, 
+    insertGastos,
+    DeleteGasto, 
 } from '../middleware/bd_gastos';
 import { gastosProps } from '../props';
 import ItemListGastos from '../components/ItemListGastos';
@@ -43,6 +45,10 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
     const [descripcion,setDescripcion] = useState(''); 
     const [modalTipo,setTipo] = useState(false);
     const [total,setTotal] = useState(-1);
+
+    const [idEliminar,setIdEliminar ] = useState('');
+
+    const [modalBorrar,setModalBorrar] = useState(false);
 
     useEffect(()=>{
         //eslint-disable-next-line
@@ -81,12 +87,19 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
             tipo_gasto:IdTipo?.value,            
         };
        let resultado = await saveGasto(gastos);
-       //alert(`Gasto guardado en id ${resultado}`);
-
+       console.log(resultado);
        setCantidad('');
        setIdTipo(defaultclassTipo);
        setIdClasificacion(defaultclassTipo);
        setDescripcion('');
+    }
+    const ComprobarDatos =():boolean=>{
+        let res = (IdTipo.value==='' || idClasificacion.value==='' || cantidad==='');
+        return res;
+    } 
+    const borrarGasto =(id:string)=>{
+        setIdEliminar(id);
+        setModalBorrar(true);
     } 
     const botonesPicker = [
         { text:'cancelar',handler(){console.log('cancelar...')},role:'calcel' },
@@ -132,7 +145,7 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
             </IonCard>
 
             <IonList>
-                {gastos.map((e:any,id:number)=>(<ItemListGastos key={id} e={e} id={e.id} />))}
+                {gastos.map((e:any,id:number)=>(<ItemListGastos onBorrar={()=>borrarGasto(e.id)} key={id} e={e} id={e.id} />))}
             </IonList>
 
             <IonItemDivider style={{padding:'25px',zIndex:95 }}>
@@ -141,7 +154,7 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
 
         </IonContent>
 
-        <IonFabButton type='button' className='fab-icon' color='success'onClick={onGuardar} >
+        <IonFabButton disabled={ComprobarDatos()} type='button' className='fab-icon' color='success'onClick={onGuardar} >
             <IonIcon icon={save} />
         </IonFabButton>
 
@@ -172,6 +185,21 @@ const AddGasto =({gastos,setGastos,saveGasto}:addGastosProps)=>{
             onDidDismiss={()=>setTipo(false)}
         />
 
+        <IonAlert 
+            onDidDismiss={()=>setModalBorrar(false)}
+            isOpen={modalBorrar}
+            header='Borrar!!!'
+            message='Desera Borrar El Gasto ?'
+            buttons={[
+                {
+                    text: 'cancelar',
+                    role: 'cancel',
+                    cssClass: 'secondary',
+                    handler(){ setIdEliminar(''); }
+                },
+                { text: 'aceptar', handler(){ DeleteGasto(idEliminar);setIdEliminar(''); } }
+            ]}
+        />
       </IonPage>);
 }
 
@@ -183,7 +211,7 @@ const mapDispatchToProps = (dispatch:any) =>({
     setGastos:()=>{
         selectAllGastos(dispatch);
     },
-    async saveGasto(value:gastosProps,onError?:()=>void):Promise< string>{
+    async saveGasto(value:gastosProps,onError?:()=>void):Promise<string>{
         return await insertGastos(value,onError);
     }
 });

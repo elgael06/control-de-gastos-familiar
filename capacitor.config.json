@@ -1,0 +1,6 @@
+{
+  "appId": "com.elgael06.CDGF",
+  "appName": "control de gastos",
+  "webDir": "build",
+  "npmClient": "yarn"
+}

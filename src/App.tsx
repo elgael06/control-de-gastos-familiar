@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { Fragment } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, IonSplitPane, IonLoading } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -30,12 +30,12 @@ import { sesionProps } from './props';
 import { cerrarSesion } from './middleware/manejo_sesion';
 
 /* rutas */
-const Menu          = lazy (()=> import('./components/Menu'));
-const Home          = lazy (()=> import('./pages/Home'));
-const List          = lazy (()=> import('./pages/List'));
-const Login         = lazy (()=> import('./pages/Login'));
-const PageNotFound  = lazy (()=> import('./pages/PageNotFound'));
-const AddGasto      = lazy (()=> import('./pages/AddGasto'));
+import Menu          from './components/Menu';
+import Home          from './pages/Home';
+import List          from './pages/List';
+import Login         from './pages/Login';
+import PageNotFound  from './pages/PageNotFound';
+import AddGasto      from './pages/AddGasto';
 
 const appPages: AppPage[] = [
   {
@@ -58,34 +58,31 @@ type appProps ={
 
 const App = ({usuario,onClose,loading}:appProps) => {
 
-  const Inicio =()=>(<Suspense fallback={()=><div> Cargando Inicio...</div>} >
+  const Inicio =()=>(<Fragment>
     <Menu appPages={appPages} usuario={usuario} onClose={onClose} />
     <IonRouterOutlet id="main" color='success'>
         
-        <Route path='*' component={PageNotFound} />
-
         <Redirect from='/login' to='/home' />
   
         <Route path="/" component={Home} exact={true} />
         <Route path="/home" component={Home} exact={true} />
         <Route path="/gastos/add" component={AddGasto} exact={true} />
         <Route path="/list" component={List} exact={true} />
+        <Route path='*' component={PageNotFound} />
         
     </IonRouterOutlet>
-  </Suspense>);
+  </Fragment>);
 
-  const Sesion= () =>(<Suspense fallback={<div>Cargando Login...</div>}>
-          <IonRouterOutlet id='main'>
-            <Redirect from='/*' to='/login' />
-            <Route path="/login" component={Login} exact={true} />
-        </IonRouterOutlet>
-      </Suspense>); 
+  const Sesion= () =>(<IonRouterOutlet id='main'>
+    <Redirect from='/*' to='/login' />
+    <Route path="/login" component={Login} exact={true} />
+  </IonRouterOutlet>); 
 
   return (
     <IonApp>
       <IonReactRouter>
         <IonSplitPane contentId="main">
-          {usuario ? <Inicio /> : <Sesion />}
+            {usuario ? <Inicio /> : <Sesion />}
         </IonSplitPane>
       </IonReactRouter>
       <IonLoading

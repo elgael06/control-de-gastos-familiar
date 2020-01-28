@@ -31,7 +31,7 @@ export const selectAllGastosGoogle = async (get:(e:any)=>void,isNull?:any)=>{
                 tipo_gasto: data.id_tipo_gasto,
                 cantidad:  data.cantidad,
                 fecha: data.fecha,
-                id_usuario: data.uid,
+                id_usuario: data.id_usuario,
                 id_clasificacion: data.id_clasificacion
             });
         });
